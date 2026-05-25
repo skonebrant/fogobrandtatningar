@@ -1,0 +1,176 @@
+---
+import { site } from '../data/site';
+import { services } from '../data/services';
+interface Props {
+  /** Pre-selected service name (used on service/combo pages) */
+  preselect?: string;
+  /** Optional origin label included in the lead email */
+  source?: string;
+  heading?: string;
+}
+const { preselect = '', source = '', heading = 'Begär offert' } = Astro.props;
+---
+<section class="band contact on-ink" id="kontakt" aria-labelledby="ko-h">
+  <div class="wrap contact-grid">
+    <div>
+      <p class="kicker on-ink">Kontakt</p>
+      <h2 id="ko-h">{heading}</h2>
+      <p class="lead">Berätta kort vad det gäller så återkommer vi med en offert. Inget projekt är för stort eller för litet.</p>
+      <div class="cinfo">
+        <div class="it"><div class="l">Telefon</div><a href={`tel:${site.phoneIntl}`}>{site.phone}</a></div>
+        <div class="it"><div class="l">Mejl</div><a href={`mailto:${site.email}`}>{site.email}</a></div>
+        <div class="it"><div class="l">Adress</div><span>{site.street}, {site.postal} {site.city}</span></div>
+      </div>
+    </div>
+
+    <form id="f" class="quote" action="/api/offert" method="POST"
+          data-preselect={preselect} aria-labelledby="qh">
+      <input type="hidden" name="tjanst" id="tjanst" value={preselect} />
+      <input type="hidden" name="kalla" value={source} />
+      {/* honeypot — humans never see or fill this */}
+      <div class="hp" aria-hidden="true">
+        <label>Lämna tomt<input type="text" name="company" tabindex="-1" autocomplete="off" /></label>
+      </div>
+
+      <div class="quote-head"><h2 id="qh">Typ av jobb</h2><span class="stepno" id="stepno" aria-hidden="true">Steg 1 / 2</span></div>
+      <div class="pbead" role="progressbar" aria-label="Formulärets framsteg" aria-valuemin="1" aria-valuemax="2" aria-valuenow="1"><i id="bar"></i></div>
+
+      <div class="stepf active" id="step1">
+        <fieldset>
+          <legend>Välj typ av jobb</legend>
+          <div class="opts">
+            {services.map((s) => (
+              <div class="opt">
+                <input type="radio" name="jobb" id={`j-${s.slug}`} value={s.name} checked={preselect === s.name} />
+                <label for={`j-${s.slug}`}>{s.name}</label>
+              </div>
+            ))}
+            <div class="opt wide">
+              <input type="radio" name="jobb" id="j-annat" value="Annat / vet ej" checked={preselect === 'Annat / vet ej'} />
+              <label for="j-annat">Annat / vet ej</label>
+            </div>
+          </div>
+        </fieldset>
+        <div class="actions"><button type="button" class="wbtn wbtn-primary" id="next" disabled={!preselect}>Nästa →</button></div>
+      </div>
+
+      <div class="stepf" id="step2">
+        <div class="status" id="status" role="status" aria-live="polite"></div>
+        <div class="f">
+          <label class="lab" for="namn">Namn</label>
+          <input class="in" id="namn" name="namn" autocomplete="name" required aria-required="true" aria-describedby="namn-err" />
+          <span class="err" id="namn-err">Fyll i ditt namn.</span>
+        </div>
+        <div class="frow">
+          <div class="f">
+            <label class="lab" for="epost">E-post</label>
+            <input class="in" id="epost" name="epost" type="email" autocomplete="email" required aria-required="true" aria-describedby="epost-err" />
+            <span class="err" id="epost-err">Ange en giltig e-postadress.</span>
+          </div>
+          <div class="f">
+            <label class="lab" for="tel">Telefon <span class="opt-note">(valfritt)</span></label>
+            <input class="in" id="tel" name="telefon" type="tel" autocomplete="tel" />
+          </div>
+        </div>
+        <div class="f">
+          <label class="lab" for="msg">Kort om jobbet <span class="opt-note">(valfritt)</span></label>
+          <textarea class="in" id="msg" name="meddelande" placeholder="Ort, byggnad och omfattning"></textarea>
+        </div>
+        <div class="actions">
+          <button type="button" class="wbtn-ghost" id="back">← Tillbaka</button>
+          <button type="submit" class="wbtn wbtn-primary">Skicka förfrågan</button>
+        </div>
+        <p class="consent">Vi använder uppgifterna endast för att besvara din förfrågan (GDPR).</p>
+      </div>
+    </form>
+  </div>
+</section>
+
+{/* No-JS fallback: reveal both steps so the native POST works without scripts */}
+<noscript><style>.stepf{display:block!important}.stepno,.pbead{display:none}</style></noscript>
+
+<style>
+  .opt-note { font-weight: 400; color: var(--muted); }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+</style>
+
+<script>
+  const form = document.getElementById('f') as HTMLFormElement | null;
+  if (form) {
+    const $ = (id: string) => document.getElementById(id);
+    const status = $('status')!, step1 = $('step1')!, step2 = $('step2')!;
+    const next = $('next') as HTMLButtonElement, back = $('back')!;
+    const bar = $('bar')!, stepno = $('stepno')!, qh = $('qh')!;
+    const pbead = document.querySelector('.pbead')!;
+    const tjanst = $('tjanst') as HTMLInputElement;
+    const rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const emailOk = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+
+    form.querySelectorAll<HTMLInputElement>('input[name=jobb]').forEach((r) =>
+      r.addEventListener('change', () => { next.disabled = false; tjanst.value = r.value; })
+    );
+
+    function go(two: boolean) {
+      step1.classList.toggle('active', !two);
+      step2.classList.toggle('active', two);
+      (bar as HTMLElement).style.width = two ? '100%' : '50%';
+      stepno.textContent = 'Steg ' + (two ? 2 : 1) + ' / 2';
+      pbead.setAttribute('aria-valuenow', two ? '2' : '1');
+      qh.textContent = two ? 'Dina uppgifter' : 'Typ av jobb';
+      if (two) ($('namn') as HTMLInputElement)?.focus({ preventScroll: true });
+    }
+    next.addEventListener('click', () => go(true));
+    back.addEventListener('click', () => { status.className = 'status'; go(false); });
+
+    // If the page pre-selected a service, jump straight to the details step
+    if (form.dataset.preselect) go(true);
+
+    // "Begär offert" links elsewhere on the page can pre-pick a service
+    document.querySelectorAll<HTMLAnchorElement>('a[data-jobb]').forEach((a) =>
+      a.addEventListener('click', (e) => {
+        const val = a.getAttribute('data-jobb')!;
+        const radio = form.querySelector<HTMLInputElement>(`input[name=jobb][value="${val}"]`);
+        if (radio) { radio.checked = true; tjanst.value = val; next.disabled = false; }
+        // only intercept if the contact form is on this page
+        if (form) {
+          e.preventDefault();
+          status.className = 'status';
+          go(true);
+          document.getElementById('kontakt')!.scrollIntoView({ behavior: rm ? 'auto' : 'smooth', block: 'start' });
+        }
+      })
+    );
+
+    function setInvalid(input: HTMLInputElement, bad: boolean) {
+      input.closest('.f')!.classList.toggle('invalid', bad);
+      input.setAttribute('aria-invalid', bad ? 'true' : 'false');
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      status.className = 'status';
+      const namn = form.namn as unknown as HTMLInputElement;
+      const epost = form.epost as unknown as HTMLInputElement;
+      let ok = true;
+      if (!namn.value.trim()) { setInvalid(namn, true); ok = false; } else setInvalid(namn, false);
+      if (!emailOk(epost.value)) { setInvalid(epost, true); ok = false; } else setInvalid(epost, false);
+      if (!ok) { form.querySelector<HTMLInputElement>('.invalid input')?.focus(); return; }
+
+      const btn = form.querySelector('button[type=submit]') as HTMLButtonElement;
+      const label = btn.textContent;
+      btn.textContent = 'Skickar…'; btn.disabled = true;
+      try {
+        const r = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
+        if (!r.ok) throw new Error();
+        status.className = 'status ok';
+        status.textContent = 'Tack! Vi återkommer så snart vi kan.';
+        form.reset(); next.disabled = true; go(false);
+      } catch {
+        status.className = 'status fail';
+        status.textContent = 'Något gick fel – ring 070-848 30 71.';
+      } finally {
+        btn.textContent = label; btn.disabled = false;
+      }
+    });
+  }
+</script>

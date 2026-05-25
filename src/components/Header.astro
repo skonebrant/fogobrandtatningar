@@ -1,0 +1,22 @@
+---
+import Logo from './Logo.astro';
+import { site } from '../data/site';
+---
+<header>
+  <div class="header-in">
+    <a class="brand" href="/" aria-label={`${site.name} – startsida`}>
+      <Logo />
+    </a>
+    <nav class="nav" aria-label="Huvudmeny">
+      <a class="lnk" href="/#tjanster">Tjänster</a>
+      <a class="lnk" href="/#arbetssatt">Så jobbar vi</a>
+      <a class="btn btn-primary" href="/#kontakt">Begär offert</a>
+    </nav>
+    <a class="header-call" href={`tel:${site.phoneIntl}`} aria-label={`Ring oss på ${site.phone}`}>Ring oss</a>
+  </div>
+</header>
+
+<style>
+  .brand { display: inline-flex; flex-shrink: 0; }
+  .brand :global(.logo) { height: clamp(54px, 8vw, 76px); }
+</style>

@@ -1,0 +1,18 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import ServiceGrid from '../components/ServiceGrid.astro';
+import Process from '../components/Process.astro';
+import Contact from '../components/Contact.astro';
+import { localBusinessLd } from '../lib/seo';
+import { site } from '../data/site';
+
+const title = `Fogning, brandtätning & radontätning i ${site.city} | ${site.name}`;
+const description = `${site.name} utför fogning, brandtätning, ljud- och radontätning i nya och befintliga byggnader i ${site.areaPhrase}. Begär offert – stora som små projekt.`;
+---
+<Base {title} {description} path="/" jsonLd={[localBusinessLd()]}>
+  <Hero />
+  <ServiceGrid />
+  <Process />
+  <Contact source="Startsida" />
+</Base>

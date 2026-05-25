@@ -1,0 +1,24 @@
+---
+const steps = [
+  { n: '01', h: 'Offert & platsbesök', p: 'Vi går igenom omfattning och förutsättningar på plats och lämnar en tydlig, fast offert.' },
+  { n: '02', h: 'Utförande', p: 'Arbetet utförs med rätt material och metod enligt gällande normer — effektivt och med omsorg om slutresultatet.' },
+  { n: '03', h: 'Besiktning & dokumentation', p: 'Vi kontrollerar, dokumenterar och överlämnar så att du har underlag för besiktning och framtida förvaltning.' },
+];
+---
+<section class="band process" id="arbetssatt" aria-labelledby="ar-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">Så jobbar vi</p>
+      <h2 id="ar-h">Från offert till färdigt</h2>
+    </div>
+    <div class="steps">
+      {steps.map((s) => (
+        <div class="step-c">
+          <span class="n">{s.n}</span>
+          <h3>{s.h}</h3>
+          <p>{s.p}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

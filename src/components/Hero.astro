@@ -1,0 +1,18 @@
+---
+import { site } from '../data/site';
+---
+<section class="hero on-ink" aria-labelledby="hero-h">
+  <div class="wrap">
+    <h1 id="hero-h">Vi tätar byggnader<br class="brk"> som ska <span class="em">hålla</span>.</h1>
+    <p class="lead"><b>{site.name}</b> utför fogning, brandtätning, ljud- och radontätning i nya och befintliga byggnader i {site.areaPhrase} — stora som små projekt.</p>
+    <div class="hero-cta">
+      <a href="#kontakt" class="btn btn-primary">Begär offert <span class="arw" aria-hidden="true">→</span></a>
+      <a href={`tel:${site.phoneIntl}`} class="btn btn-outline on-ink">{site.phone}</a>
+    </div>
+    <div class="runner">
+      <span class="loc">{site.city}</span>
+      <span class="seam on-ink" aria-hidden="true"></span>
+      <span class="loc">Hela Mälardalen</span>
+    </div>
+  </div>
+</section>

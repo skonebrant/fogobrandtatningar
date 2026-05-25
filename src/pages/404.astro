@@ -1,0 +1,18 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../data/site';
+const title = `Sidan hittades inte | ${site.name}`;
+const description = 'Sidan kunde inte hittas.';
+---
+<Base {title} {description} path="/404/" noindex>
+  <section class="hero on-ink" aria-labelledby="nf-h">
+    <div class="wrap">
+      <h1 id="nf-h">404</h1>
+      <p class="lead">Sidan kunde inte hittas. Den kan ha flyttats eller tagits bort.</p>
+      <div class="hero-cta">
+        <a href="/" class="btn btn-primary">Till startsidan <span class="arw" aria-hidden="true">→</span></a>
+        <a href={`tel:${site.phoneIntl}`} class="btn btn-outline on-ink">{site.phone}</a>
+      </div>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,24 @@
+---
+interface Props { items: { name: string; path: string }[] }
+const { items } = Astro.props;
+---
+<nav class="crumbs" aria-label="Brödsmulor">
+  <ol>
+    {items.map((it, i) => (
+      <li>
+        {i < items.length - 1 ? <a href={it.path}>{it.name}</a> : <span aria-current="page">{it.name}</span>}
+        {i < items.length - 1 && <span class="sep" aria-hidden="true">/</span>}
+      </li>
+    ))}
+  </ol>
+</nav>
+
+<style>
+  .crumbs { margin-bottom: 1.4rem; }
+  .crumbs ol { list-style: none; display: flex; flex-wrap: wrap; gap: .4rem .6rem; padding: 0; margin: 0; }
+  .crumbs li { display: inline-flex; align-items: center; gap: .6rem; font-size: .9rem; color: var(--muted-d); }
+  .crumbs a { color: var(--muted-d); }
+  .crumbs a:hover { color: var(--accent); }
+  .crumbs [aria-current="page"] { color: var(--paper); }
+  .crumbs .sep { opacity: .5; }
+</style>

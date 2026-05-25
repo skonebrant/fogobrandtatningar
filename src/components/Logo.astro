@@ -1,0 +1,14 @@
+---
+// Inlines the optimized logo SVG (fill="currentColor") so it is request-free
+// and inherits its colour from the surrounding context — ink on light
+// surfaces, paper on dark. The link/parent provides the accessible name.
+import logo from './logo-inline.svg?raw';
+interface Props { class?: string }
+const { class: className = '' } = Astro.props;
+---
+<span class:list={['logo', className]} set:html={logo} aria-hidden="true"></span>
+
+<style>
+  .logo { display: inline-flex; line-height: 0; }
+  .logo :global(svg) { height: 100%; width: auto; display: block; }
+</style>

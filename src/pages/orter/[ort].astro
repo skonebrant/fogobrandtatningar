@@ -1,0 +1,78 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import Process from '../../components/Process.astro';
+import Contact from '../../components/Contact.astro';
+import { locations, townBySlug, nearbyTowns } from '../../data/locations';
+import { services } from '../../data/services';
+import { site } from '../../data/site';
+import { townPath, comboPath, breadcrumbLd, serviceLd } from '../../lib/seo';
+
+export function getStaticPaths() {
+  return locations.map((town) => ({ params: { ort: town.slug }, props: { town } }));
+}
+
+const { town } = Astro.props;
+const path = townPath(town);
+const nearby = nearbyTowns(town, 6);
+const title = `Fogning & tätning i ${town.name} | ${site.name}`;
+const description = `${site.name} utför fogning, brandtätning, ljud- och radontätning i ${town.name} (${town.region}). Begär offert – stora som små projekt.`;
+const crumbs = [
+  { name: 'Hem', path: '/' },
+  { name: town.name, path },
+];
+const intro = [
+  `${site.name} utför fog- och tätningsarbeten i ${town.name} och övriga ${town.region}.`,
+  `Vi hjälper både privatpersoner, fastighetsägare och byggföretag med fogning, brandtätning, ljudtätning och radontätning — i nya som befintliga byggnader.`,
+];
+const jsonLd = [serviceLd(services[0], town.name), breadcrumbLd(crumbs)];
+---
+<Base {title} {description} {path} {jsonLd}>
+  <PageHeader kicker={`Tätning i ${town.region}`} title={`Fogning & tätning i ${town.name}`} intro={intro} crumbs={crumbs} />
+
+  <section class="band services" aria-labelledby="tj-h">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="kicker">Tjänster i {town.name}</p>
+        <h2 id="tj-h">Det vi gör i {town.name}</h2>
+        <p>Välj tjänst för mer information, eller begär offert direkt.</p>
+      </div>
+      <div class="srv-grid">
+        {services.map((s, i) => (
+          <a class="srv" href={comboPath(s, town)}>
+            <span class="no" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            <h3>{s.name} i {town.name}</h3>
+            <p>{s.short}</p>
+            <span class="more">Läs mer <span aria-hidden="true">→</span></span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <Process />
+
+  {nearby.length > 0 && (
+    <section class="band nearby" aria-labelledby="nb-h">
+      <div class="wrap">
+        <div class="sec-head">
+          <p class="kicker">Närliggande orter</p>
+          <h2 id="nb-h">Vi finns även här</h2>
+        </div>
+        <ul class="town-links">
+          {nearby.map((t) => <li><a href={townPath(t)}>{t.name}</a></li>)}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <Contact source={`Ort: ${town.name}`} heading={`Begär offert i ${town.name}`} />
+</Base>
+
+<style>
+  a.srv { text-decoration: none; color: inherit; }
+  .nearby { background: var(--paper-2); }
+  .town-links { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: .6rem 1.4rem; }
+  .town-links a { font-weight: 600; font-size: 1.1rem; border-bottom: 2px solid var(--accent); padding-bottom: 2px; }
+  .town-links a:hover { color: var(--accent-deep); }
+</style>

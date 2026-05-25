@@ -1,0 +1,76 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import ServiceGrid from '../../components/ServiceGrid.astro';
+import Process from '../../components/Process.astro';
+import Faq from '../../components/Faq.astro';
+import Contact from '../../components/Contact.astro';
+import { services } from '../../data/services';
+import { locations, regions } from '../../data/locations';
+import { site } from '../../data/site';
+import { servicePath, comboPath, serviceLd, breadcrumbLd, faqLd } from '../../lib/seo';
+
+export function getStaticPaths() {
+  return services.map((service) => ({ params: { service: service.slug }, props: { service } }));
+}
+
+const { service } = Astro.props;
+const path = servicePath(service);
+const title = `${service.name} i ${site.areaPhrase} | ${site.name}`;
+const description = `${service.short} ${site.name} utför ${service.name.toLowerCase()} i ${site.areaPhrase}. Begär offert.`;
+const crumbs = [
+  { name: 'Hem', path: '/' },
+  { name: service.name, path },
+];
+const jsonLd = [serviceLd(service, site.areaPhrase), breadcrumbLd(crumbs), faqLd(service.faqs)];
+---
+<Base {title} {description} {path} {jsonLd}>
+  <PageHeader kicker="Tjänst" title={`${service.name} i ${site.areaPhrase}`} intro={[service.intro]} crumbs={crumbs} />
+
+  <section class="band" aria-labelledby="scope-h">
+    <div class="wrap two-col">
+      <div>
+        <p class="kicker">Det här ingår</p>
+        <h2 id="scope-h">{service.name} – vad vi gör</h2>
+        <ul class="ticks">
+          {service.scope.map((s) => <li>{s}</li>)}
+        </ul>
+        <p class="muted-p">Vi utför även {service.synonyms.join(', ')}. Hör av dig så hjälper vi dig hitta rätt lösning.</p>
+      </div>
+      <aside class="towns-card" aria-labelledby="orter-h">
+        <h2 id="orter-h" class="towns-h">{service.name} – orter vi täcker</h2>
+        {regions.map((region) => (
+          <div class="town-group">
+            <span class="town-region">{region}</span>
+            <ul class="town-links">
+              {locations.filter((t) => t.region === region).map((t) => (
+                <li><a href={comboPath(service, t)}>{t.name}</a></li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </aside>
+    </div>
+  </section>
+
+  <Process />
+  <Faq items={service.faqs} heading={`Frågor om ${service.name.toLowerCase()}`} />
+  <ServiceGrid kicker="Fler tjänster" heading="Andra tjänster" intro="" exclude={service.slug} />
+  <Contact preselect={service.name} source={`Tjänst: ${service.name}`} heading={`Begär offert – ${service.name}`} />
+</Base>
+
+<style>
+  .two-col { display: grid; gap: clamp(32px, 5vw, 64px); grid-template-columns: 1fr; }
+  @media (min-width: 860px) { .two-col { grid-template-columns: 1.1fr .9fr; align-items: start; } }
+  .ticks { list-style: none; padding: 0; margin: 1.4rem 0 0; }
+  .ticks li { position: relative; padding-left: 1.8rem; margin-bottom: .8rem; font-size: 1.06rem; }
+  .ticks li::before { content: ''; position: absolute; left: 0; top: .55em; width: 12px; height: 2px; background: var(--accent-deep); }
+  .muted-p { color: var(--muted); margin-top: 1.6rem; max-width: 56ch; }
+  .towns-card { border: 1px solid var(--line); background: var(--card); padding: clamp(22px, 3vw, 32px); }
+  .towns-h { font-size: 1.3rem; margin-bottom: 1rem; }
+  .town-group { margin-bottom: 1.1rem; }
+  .town-region { display: block; font-weight: 600; font-size: .82rem; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); margin-bottom: .4rem; }
+  .town-links { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: .3rem .9rem; }
+  .town-links a { font-weight: 600; border-bottom: 1px solid transparent; }
+  .town-links a:hover { border-color: var(--accent); }
+</style>

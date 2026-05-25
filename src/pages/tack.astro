@@ -1,0 +1,18 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../data/site';
+const title = `Tack för din förfrågan | ${site.name}`;
+const description = 'Tack! Vi har tagit emot din offertförfrågan och återkommer så snart vi kan.';
+---
+<Base {title} {description} path="/tack/" noindex>
+  <section class="hero on-ink" aria-labelledby="tack-h">
+    <div class="wrap">
+      <h1 id="tack-h">Tack!</h1>
+      <p class="lead">Vi har tagit emot din förfrågan och återkommer så snart vi kan. Brådskar det? Ring <a href={`tel:${site.phoneIntl}`} class="acc">{site.phone}</a>.</p>
+      <div class="hero-cta">
+        <a href="/" class="btn btn-primary">Till startsidan <span class="arw" aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </section>
+</Base>
+<style>.acc{color:var(--accent)}</style>

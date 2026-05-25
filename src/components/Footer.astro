@@ -1,0 +1,30 @@
+---
+import Logo from './Logo.astro';
+import { site } from '../data/site';
+const year = new Date().getFullYear();
+---
+<div class="seam" aria-hidden="true"></div>
+<footer>
+  <div class="foot-in">
+    <div class="foot-top">
+      <a href="/" aria-label={`${site.name} – startsida`} class="foot-logo">
+        <Logo />
+      </a>
+      <p>Fog- och tätningsentreprenad &amp; passivt brandskydd i {site.areaPhrase}.</p>
+    </div>
+    <div class="foot-meta">
+      <span><b>Telefon</b><a href={`tel:${site.phoneIntl}`}>{site.phone}</a></span>
+      <span><b>Mejl</b><a href={`mailto:${site.email}`}>{site.email}</a></span>
+      <span><b>Org.nr</b>{site.orgnr}</span>
+    </div>
+    <div class="foot-bottom">
+      <span>© {year} {site.legalName} · {site.city}</span>
+      <a href="#top">Till toppen ↑</a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .foot-logo { display: inline-flex; color: var(--paper); }
+  .foot-logo :global(.logo) { height: clamp(56px, 7vw, 72px); }
+</style>

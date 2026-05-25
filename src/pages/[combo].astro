@@ -1,0 +1,106 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import Faq from '../components/Faq.astro';
+import Process from '../components/Process.astro';
+import Contact from '../components/Contact.astro';
+import { services } from '../data/services';
+import { locations, nearbyTowns } from '../data/locations';
+import { site } from '../data/site';
+import {
+  comboPath, servicePath, townPath,
+  comboTitle, comboDescription, comboIntro,
+  serviceLd, breadcrumbLd, faqLd,
+} from '../lib/seo';
+
+export function getStaticPaths() {
+  const paths = [];
+  for (const service of services) {
+    for (const town of locations) {
+      paths.push({
+        params: { combo: `${service.slug}-${town.slug}` },
+        props: { service, town },
+      });
+    }
+  }
+  return paths;
+}
+
+const { service, town } = Astro.props;
+const path = comboPath(service, town);
+const title = comboTitle(service, town);
+const description = comboDescription(service, town);
+const intro = comboIntro(service, town);
+const nearby = nearbyTowns(town, 6);
+const others = services.filter((s) => s.slug !== service.slug);
+
+const crumbs = [
+  { name: 'Hem', path: '/' },
+  { name: service.name, path: servicePath(service) },
+  { name: town.name, path },
+];
+const jsonLd = [serviceLd(service, town.name), breadcrumbLd(crumbs), faqLd(service.faqs)];
+---
+<Base {title} {description} {path} {jsonLd}>
+  <PageHeader kicker={`${service.name} · ${town.region}`} title={`${service.name} i ${town.name}`} intro={intro} crumbs={crumbs} />
+
+  <section class="band" aria-labelledby="scope-h">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="kicker">Det här ingår</p>
+        <h2 id="scope-h">{service.name} i {town.name} – så hjälper vi dig</h2>
+      </div>
+      <ul class="ticks">
+        {service.scope.map((s) => <li>{s}</li>)}
+      </ul>
+      <p class="muted-p">
+        Vi utför {service.name.toLowerCase()} ({service.synonyms.join(', ')}) i {town.name} och övriga {town.region}.
+        <a href={servicePath(service)} class="inline-link">Läs mer om {service.name.toLowerCase()}</a> eller
+        <a href={townPath(town)} class="inline-link">se alla våra tjänster i {town.name}</a>.
+      </p>
+    </div>
+  </section>
+
+  <Process />
+
+  <Faq items={service.faqs} heading={`Frågor om ${service.name.toLowerCase()}`} />
+
+  <section class="band links-band" aria-labelledby="more-h">
+    <div class="wrap">
+      <div class="sec-head"><h2 id="more-h" class="vsm">Mer i närheten</h2></div>
+      <div class="links-grid">
+        <div>
+          <h3 class="links-sub">{service.name} i andra orter</h3>
+          <ul class="town-links">
+            {nearby.map((t) => <li><a href={comboPath(service, t)}>{service.name} {t.name}</a></li>)}
+          </ul>
+        </div>
+        <div>
+          <h3 class="links-sub">Andra tjänster i {town.name}</h3>
+          <ul class="town-links">
+            {others.map((s) => <li><a href={comboPath(s, town)}>{s.name} {town.name}</a></li>)}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Contact preselect={service.name} source={`${service.name} – ${town.name}`} heading={`Begär offert – ${service.name} i ${town.name}`} />
+</Base>
+
+<style>
+  .ticks { list-style: none; padding: 0; margin: 0; max-width: 60ch; }
+  .ticks li { position: relative; padding-left: 1.8rem; margin-bottom: .8rem; font-size: 1.06rem; }
+  .ticks li::before { content: ''; position: absolute; left: 0; top: .55em; width: 12px; height: 2px; background: var(--accent-deep); }
+  .muted-p { color: var(--muted); margin-top: 1.6rem; max-width: 62ch; }
+  .inline-link { color: var(--ink); border-bottom: 2px solid var(--accent); font-weight: 600; }
+  .inline-link:hover { color: var(--accent-deep); }
+  .links-band { background: var(--paper-2); }
+  .vsm { font-size: clamp(1.6rem, 3.5vw, 2.2rem); }
+  .links-grid { display: grid; gap: clamp(24px, 4vw, 48px); grid-template-columns: 1fr; }
+  @media (min-width: 720px) { .links-grid { grid-template-columns: 1fr 1fr; } }
+  .links-sub { font-size: 1.15rem; margin-bottom: .9rem; }
+  .town-links { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: .5rem 1.1rem; }
+  .town-links a { font-weight: 600; border-bottom: 1px solid var(--line); padding-bottom: 1px; }
+  .town-links a:hover { border-color: var(--accent); color: var(--accent-deep); }
+</style>

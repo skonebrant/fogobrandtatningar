@@ -1,0 +1,29 @@
+---
+import { site } from '../data/site';
+import Breadcrumbs from './Breadcrumbs.astro';
+interface Props {
+  kicker?: string;
+  title: string;
+  intro?: string | string[];
+  crumbs: { name: string; path: string }[];
+}
+const { kicker, title, intro, crumbs } = Astro.props;
+const paras = Array.isArray(intro) ? intro : intro ? [intro] : [];
+---
+<section class="hero on-ink pagehead" aria-labelledby="page-h">
+  <div class="wrap">
+    <Breadcrumbs items={crumbs} />
+    {kicker && <p class="kicker on-ink">{kicker}</p>}
+    <h1 id="page-h">{title}</h1>
+    {paras.map((p) => <p class="lead">{p}</p>)}
+    <div class="hero-cta">
+      <a href="#kontakt" class="btn btn-primary">Begär offert <span class="arw" aria-hidden="true">→</span></a>
+      <a href={`tel:${site.phoneIntl}`} class="btn btn-outline on-ink">{site.phone}</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pagehead h1 { font-size: clamp(2.3rem, 6vw, 4.4rem); max-width: 18ch; }
+  .pagehead .lead + .lead { margin-top: .8rem; }
+</style>
