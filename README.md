@@ -130,3 +130,4 @@ varieras automatiskt per sida, men för bäst resultat:
 - Bilder via `astro:assets` (AVIF/WebP) när riktiga projektbilder finns.
 - Återinför "Om oss"-sektionen med riktiga förtroendesignaler (F-skatt, försäkring, certifieringar) — de hjälper konvertering.
 # fogobrandtatningar
+# fogobrandtatningar
